@@ -1538,7 +1538,15 @@ updateAllProgress();
 initTools();
 
 </script>
-<script>window.GDRIVE_CLIENT_ID = '358625617188-h4dafdsn0rib86jabubdb8pgrtlch2vg.apps.googleusercontent.com';</script>
+<script>
+window.GDRIVE_CLIENT_ID = '358625617188-h4dafdsn0rib86jabubdb8pgrtlch2vg.apps.googleusercontent.com';
+window.gdriveOnStateChange = function(state, text) {
+  var badge = document.getElementById('drive-badge');
+  var dbText = document.getElementById('db-text');
+  if (badge) badge.dataset.state = state;
+  if (dbText) dbText.textContent = text;
+};
+</script>
 <script src="gdrive_sync.js" defer></script>
 </body>
 </html>
