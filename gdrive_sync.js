@@ -6,6 +6,7 @@
 // Page should declare a global: window.GDRIVE_CLIENT_ID = '...'
 
 const GDRIVE_FILE_NAME = 'fitness_tracker_backup.json';
+const GDRIVE_FOLDER_ID = '1I780KnWEU3DU7lhmokroTkWOBEhJUqZU';
 const GDRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
 const GDRIVE_KEYS = ['kb_tracker_v1','bw_tracker_v1','mf_tracker_v1','fitness_math_v1','body_log_v1','benchmarks_v1'];
 const GDRIVE_TOKEN_STORAGE = 'gdrive_token_v1';
@@ -129,7 +130,7 @@ function gdriveDisconnect(){
 
 function gdriveFindOrCreateFile(){
   if(gdriveFileId) return Promise.resolve(gdriveFileId);
-  return fetch(`https://www.googleapis.com/drive/v3/files?q=name='${GDRIVE_FILE_NAME}'+and+trashed=false&spaces=drive&fields=files(id,name)`, {
+  return fetch(`https://www.googleapis.com/drive/v3/files?q=name='${GDRIVE_FILE_NAME}'+and+'${GDRIVE_FOLDER_ID}'+in+parents+and+trashed=false&spaces=drive&fields=files(id,name)`, {
     headers: { 'Authorization': 'Bearer ' + gdriveAccessToken }
   })
   .then(r => { if(r.status === 401) throw new Error('unauthorized'); return r.json(); })
@@ -142,7 +143,7 @@ function gdriveFindOrCreateFile(){
     return fetch('https://www.googleapis.com/drive/v3/files', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + gdriveAccessToken, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: GDRIVE_FILE_NAME, mimeType: 'application/json' })
+      body: JSON.stringify({ name: GDRIVE_FILE_NAME, mimeType: 'application/json', parents: [GDRIVE_FOLDER_ID] })
     })
     .then(r => r.json())
     .then(f => {
