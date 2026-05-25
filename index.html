@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+:root{
+  --red:#C0392B;--red-dark:#96281B;--black:#111;--dark:#1C1C1C;--card:#242424;
+  --border:#333;--muted:#888;--muted-light:#AAA;--light:#F0F0F0;--white:#FFF;
+  --green:#27AE60;--yellow:#F39C12;--blue:#2980B9;--purple:#8E44AD;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:
+    linear-gradient(rgba(17,17,17,.55), rgba(17,17,17,.65)),
+    url('bg.jpg') center center / cover no-repeat fixed,
+    var(--black);
+  color:var(--light);font-family:'DM Sans',sans-serif;
+  font-size:17px;min-height:100vh;display:flex;flex-direction:column;
+}
+
+header{
+  background:rgba(28,28,28,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-bottom:3px solid var(--red);
+  padding:18px 24px;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:10px;
+}
+header h1{font-family:'Bebas Neue',sans-serif;font-size:33px;letter-spacing:3px;color:var(--white);line-height:1;}
+header h1 span{color:var(--red);}
+.header-sub{font-size:13px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.header-date{font-size:14px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+
+main{flex:1;max-width:1200px;margin:0 auto;width:100%;padding:32px 20px;}
+
+.intro{margin-bottom:28px;}
+.intro h2{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1.5px;color:var(--white);margin-bottom:8px;}
+.intro p{font-size:16px;color:var(--muted-light);line-height:1.6;max-width:680px;}
+
+.tracker-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;
+}
+
+.tracker-card{
+  background:rgba(36,36,36,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;
+  overflow:hidden;text-decoration:none;color:var(--light);
+  display:flex;flex-direction:column;transition:all .2s ease;cursor:pointer;
+  position:relative;
+}
+.tracker-card:hover{border-color:var(--red);transform:translateY(-2px);box-shadow:0 8px 24px rgba(192,57,43,.15);}
+.tracker-card-accent{height:5px;background:var(--red);}
+.tracker-card.bw .tracker-card-accent{background:var(--blue);}
+.tracker-card.mf .tracker-card-accent{background:var(--purple);}
+.tracker-card.kb .tracker-card-accent{background:var(--red);}
+
+.tracker-card-body{padding:22px;flex:1;display:flex;flex-direction:column;}
+.tracker-card h3{
+  font-family:'Bebas Neue',sans-serif;font-size:25px;letter-spacing:1.8px;
+  color:var(--white);margin-bottom:4px;line-height:1.1;
+}
+.tracker-card h3 span{color:var(--red);}
+.tracker-card.bw h3 span{color:var(--blue);}
+.tracker-card.mf h3 span{color:var(--purple);}
+.tracker-card-tag{
+  font-size:12px;letter-spacing:1.5px;color:var(--muted-light);text-transform:uppercase;margin-bottom:14px;
+}
+.tracker-card p{font-size:15px;color:var(--light);line-height:1.6;margin-bottom:16px;}
+
+.tracker-card-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;
+  padding-top:14px;border-top:1px solid var(--border);
+}
+.stat{text-align:center;}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:21px;color:var(--white);letter-spacing:1px;line-height:1;}
+.stat-label{font-size:11.5px;color:var(--white);text-transform:uppercase;letter-spacing:.8px;margin-top:3px;}
+
+.tracker-card-equipment{
+  margin-bottom:14px;
+}
+.tracker-card-equipment h4{font-size:12px;color:var(--muted-light);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+.eq-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.eq-tag{
+  font-size:13px;background:rgba(28,28,28,.6);border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:3px 9px;color:var(--light);
+}
+
+.tracker-card-cta{
+  margin-top:auto;display:flex;align-items:center;justify-content:space-between;
+  padding-top:14px;border-top:1px solid var(--border);
+}
+.cta-text{
+  font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--red);
+  text-shadow:0 0 1px rgba(255,255,255,.6),0 0 2px rgba(255,255,255,.3);
+}
+.tracker-card.bw .cta-text{color:var(--blue);}
+.tracker-card.mf .cta-text{color:var(--purple);}
+.cta-arrow{font-size:21px;color:var(--red);transition:transform .2s;}
+.tracker-card:hover .cta-arrow{transform:translateX(4px);}
+.tracker-card.bw .cta-arrow{color:var(--blue);}
+.tracker-card.mf .cta-arrow{color:var(--purple);}
+
+/* Shared tools section */
+.shared-section{
+  margin-top:36px;background:rgba(36,36,36,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:22px;
+}
+.shared-section h2{
+  font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1.5px;
+  color:var(--white);margin-bottom:6px;
+}
+.shared-section h2 span{color:var(--red);}
+.shared-section > p{font-size:15px;color:var(--white);margin-bottom:16px;line-height:1.6;}
+.shared-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+.shared-item{
+  background:rgba(28,28,28,.55);border:1px solid rgba(255,255,255,.08);border-radius:6px;
+  padding:13px 14px;
+}
+.shared-item h4{
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;
+  color:var(--white);margin-bottom:4px;
+}
+.shared-item p{font-size:13.5px;color:var(--white);line-height:1.5;}
+
+/* Footer */
+footer{
+  background:rgba(28,28,28,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-top:1px solid var(--border);
+  padding:16px 24px;font-size:13px;color:var(--muted);
+  text-align:center;letter-spacing:1px;text-transform:uppercase;
+}
+footer a{color:var(--muted);text-decoration:none;transition:color .15s;}
+footer a:hover{color:var(--red);}
+.footer-divider{margin:0 8px;color:var(--border);}
+
+@media(max-width:640px){
+  body{
+    background:
+      linear-gradient(rgba(17,17,17,.6), rgba(17,17,17,.7)),
+      url('bg.jpg') center top / cover no-repeat;
+    background-attachment:scroll;
+  }
+  header{padding:14px 16px;}
+  header h1{font-size:27px;letter-spacing:2px;}
+  main{padding:24px 14px;}
+  .tracker-card-body{padding:18px;}
+  .tracker-card h3{font-size:23px;}
+}
+.sync-section{
+  margin-top:36px;background:rgba(36,36,36,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:24px;
+}
+.sync-section h2{
+  font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:1.5px;
+  color:var(--white);margin-bottom:8px;
+}
+.sync-section h2 span{color:var(--red);}
+.sync-section > p{font-size:14px;color:var(--muted-light);margin-bottom:18px;line-height:1.6;max-width:680px;}
+.sync-card{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;
+  background:rgba(28,28,28,.6);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:18px 20px;
+}
+.sync-status{display:flex;align-items:center;gap:14px;flex:1;min-width:240px;}
+.sync-dot{width:12px;height:12px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .2s;}
+.sync-dot[data-state="connected"]{background:var(--green);}
+.sync-dot[data-state="syncing"]{background:var(--yellow);animation:sync-pulse 1s infinite;}
+.sync-dot[data-state="error"]{background:var(--red);}
+@keyframes sync-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-info{flex:1;}
+.sync-headline{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--white);margin-bottom:3px;}
+.sync-detail{font-size:13px;color:var(--muted-light);line-height:1.4;}
+.sync-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-sync{
+  padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:13px;letter-spacing:.5px;
+  background:var(--dark);border:1px solid var(--border);color:var(--white);border-radius:6px;
+  cursor:pointer;transition:all .15s;font-weight:500;
+}
+.btn-sync:hover{border-color:var(--red);color:var(--red);}
+.btn-sync.btn-primary{background:var(--red);border-color:var(--red);color:var(--white);}
+.btn-sync.btn-primary:hover{background:var(--red-dark);border-color:var(--red-dark);}
+.btn-sync.btn-danger:hover{border-color:#E74C3C;color:#E74C3C;}
+.btn-sync:disabled{opacity:.5;cursor:not-allowed;}
+@media(max-width:640px){
+  .sync-card{flex-direction:column;align-items:stretch;}
+  .sync-actions{justify-content:flex-start;}
+  .btn-sync{flex:1;min-width:130px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>FITNESS <span>TRACKER</span></h1>
+    <div class="header-sub">Train. Log. Progress.</div>
+  </div>
+  <div class="header-date" id="today-date"></div>
+</header>
+
+<main>
+
+  <div class="intro">
+    <h2>PICK YOUR PROGRAM</h2>
+    <p>Three programs, three styles of training, one shared data system. Body Log, Fitness Math, and Benchmarks are accessible from inside any tracker — your weight, measurements, and lifts carry across all three.</p>
+  </div>
+
+  <div class="tracker-grid">
+
+    <a class="tracker-card kb" href="KB_Workout_Tracker.html">
+      <div class="tracker-card-accent"></div>
+      <div class="tracker-card-body">
+        <h3>KETTLEBELL <span>COMPOUND</span></h3>
+        <div class="tracker-card-tag">StrongFirst Style · The Big 5</div>
+        <p>Five movement patterns hit every muscle, every session. Pavel-style training built around swings, squats, presses, pulls, and Turkish Get-Ups.</p>
+
+        <div class="tracker-card-equipment">
+          <h4>Equipment</h4>
+          <div class="eq-tags">
+            <span class="eq-tag">8 kg</span>
+            <span class="eq-tag">12 kg</span>
+            <span class="eq-tag">16 kg</span>
+            <span class="eq-tag">20 kg</span>
+          </div>
+        </div>
+
+        <div class="tracker-card-stats">
+          <div class="stat"><div class="stat-value">3×</div><div class="stat-label">Per Week</div></div>
+          <div class="stat"><div class="stat-value">28</div><div class="stat-label">Weeks</div></div>
+          <div class="stat"><div class="stat-value">4</div><div class="stat-label">Phases</div></div>
+        </div>
+
+        <div class="tracker-card-cta">
+          <span class="cta-text">Open Tracker</span>
+          <span class="cta-arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="tracker-card bw" href="BW_Workout_Tracker_v2.html">
+      <div class="tracker-card-accent"></div>
+      <div class="tracker-card-body">
+        <h3>BODYWEIGHT <span>COMPOUND</span></h3>
+        <div class="tracker-card-tag">The Laziest Way to Build Muscle</div>
+        <p>No equipment, no gym. Variation-based progression — when push-ups get easy, switch to a harder variation, not heavier weights.</p>
+
+        <div class="tracker-card-equipment">
+          <h4>Equipment</h4>
+          <div class="eq-tags">
+            <span class="eq-tag">Pull-up bar</span>
+            <span class="eq-tag">Dip bars</span>
+            <span class="eq-tag">Floor</span>
+          </div>
+        </div>
+
+        <div class="tracker-card-stats">
+          <div class="stat"><div class="stat-value">3×</div><div class="stat-label">Per Week</div></div>
+          <div class="stat"><div class="stat-value">28</div><div class="stat-label">Weeks</div></div>
+          <div class="stat"><div class="stat-value">4</div><div class="stat-label">Phases</div></div>
+        </div>
+
+        <div class="tracker-card-cta">
+          <span class="cta-text">Open Tracker</span>
+          <span class="cta-arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="tracker-card mf" href="MF_Workout_Tracker_v3.html">
+      <div class="tracker-card-accent"></div>
+      <div class="tracker-card-body">
+        <h3>MUSCLE <span>FACTORY</span></h3>
+        <div class="tracker-card-tag">Progressive Overload · Split Training</div>
+        <p>Classic split training with compounds and accessories. Phase-based rep ranges from strength to hypertrophy to higher volume.</p>
+
+        <div class="tracker-card-equipment">
+          <h4>Equipment</h4>
+          <div class="eq-tags">
+            <span class="eq-tag">Dumbbells</span>
+            <span class="eq-tag">Barbell</span>
+            <span class="eq-tag">Pull-up bar</span>
+            <span class="eq-tag">Dip bars</span>
+          </div>
+        </div>
+
+        <div class="tracker-card-stats">
+          <div class="stat"><div class="stat-value">3-4×</div><div class="stat-label">Per Week</div></div>
+          <div class="stat"><div class="stat-value">28</div><div class="stat-label">Weeks</div></div>
+          <div class="stat"><div class="stat-value">4</div><div class="stat-label">Phases</div></div>
+        </div>
+
+        <div class="tracker-card-cta">
+          <span class="cta-text">Open Tracker</span>
+          <span class="cta-arrow">→</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="shared-section">
+    <h2>SHARED <span>TOOLS</span></h2>
+    <p>Available inside every tracker. Your data syncs across all three — log it once, see it everywhere.</p>
+    <div class="shared-grid">
+      <div class="shared-item">
+        <h4>Fitness Math</h4>
+        <p>BMR, TDEE, BMI, body fat, macros, 1RM calculator</p>
+      </div>
+      <div class="shared-item">
+        <h4>Body Log</h4>
+        <p>Daily weight, sleep, RHR, readiness, measurements, trends</p>
+      </div>
+      <div class="shared-item">
+        <h4>Benchmarks</h4>
+        <p>Strength standards, KB tests, BW tests, photo log</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sync-section">
+    <h2>CLOUD <span>SYNC</span></h2>
+    <p>Backs up all 3 trackers + your Fitness Math, Body Log, and Benchmarks to a single file in your Google Drive. Sign in once, access from any device.</p>
+
+    <div class="sync-card" id="sync-card">
+      <div class="sync-status">
+        <span class="sync-dot" id="sync-dot"></span>
+        <div class="sync-info">
+          <div class="sync-headline" id="sync-headline">Not connected</div>
+          <div class="sync-detail" id="sync-detail">Sign in to back up your data to Google Drive</div>
+        </div>
+      </div>
+      <div class="sync-actions" id="sync-actions">
+        <button class="btn-sync btn-primary" id="btn-connect" onclick="gdriveConnect()">Connect Google Drive</button>
+        <button class="btn-sync" id="btn-sync-now" onclick="syncNowClick()" style="display:none">Sync All Now</button>
+        <button class="btn-sync" id="btn-pull" onclick="pullClick()" style="display:none">Pull from Drive</button>
+        <button class="btn-sync btn-danger" id="btn-disconnect" onclick="disconnectClick()" style="display:none">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span id="footer-date"></span>
+  <span class="footer-divider">·</span>
+  Train smart. Recover hard. Show up daily.
+</footer>
+
+<script>
+(function(){
+  const today = new Date();
+  const opts = {weekday:'long', year:'numeric', month:'short', day:'numeric'};
+  const dateStr = today.toLocaleDateString(undefined, opts);
+  document.getElementById('today-date').textContent = dateStr;
+
+  // Week of year for footer
+  const start = new Date(today.getFullYear(), 0, 1);
+  const week = Math.ceil((((today - start) / 86400000) + start.getDay() + 1) / 7);
+  document.getElementById('footer-date').textContent = `Week ${week} · ${today.getFullYear()}`;
+})();
+
+// ── DRIVE SYNC UI ──────────────────────────────────────────────────────
+window.gdriveOnStateChange = function(state, text){
+  const dot = document.getElementById('sync-dot');
+  const headline = document.getElementById('sync-headline');
+  const detail = document.getElementById('sync-detail');
+  const btnConnect = document.getElementById('btn-connect');
+  const btnSync = document.getElementById('btn-sync-now');
+  const btnPull = document.getElementById('btn-pull');
+  const btnDisconnect = document.getElementById('btn-disconnect');
+  if(!dot) return;
+
+  dot.setAttribute('data-state', state);
+
+  if(state === 'connected'){
+    const email = (typeof gdriveGetEmail === 'function' ? gdriveGetEmail() : null);
+    headline.textContent = email ? `Connected as ${email}` : 'Connected';
+    detail.textContent = text || 'Ready to sync';
+    btnConnect.style.display = 'none';
+    btnSync.style.display = 'inline-block';
+    btnPull.style.display = 'inline-block';
+    btnDisconnect.style.display = 'inline-block';
+  } else if(state === 'syncing'){
+    headline.textContent = 'Syncing...';
+    detail.textContent = text || 'Working';
+    btnSync.disabled = true;
+    btnPull.disabled = true;
+  } else if(state === 'error'){
+    headline.textContent = 'Error';
+    detail.textContent = text || 'Something went wrong';
+    btnSync.disabled = false;
+    btnPull.disabled = false;
+  } else {
+    // 'off'
+    headline.textContent = 'Not connected';
+    detail.textContent = 'Sign in to back up your data to Google Drive';
+    btnConnect.style.display = 'inline-block';
+    btnSync.style.display = 'none';
+    btnPull.style.display = 'none';
+    btnDisconnect.style.display = 'none';
+    btnSync.disabled = false;
+    btnPull.disabled = false;
+  }
+};
+
+function syncNowClick(){
+  if(typeof gdrivePush === 'function'){
+    gdrivePush(true).catch(e => console.warn(e));
+  }
+}
+function pullClick(){
+  if(typeof gdrivePull === 'function'){
+    if(confirm('Pull latest data from Drive? This will OVERWRITE any unsaved local data.')){
+      gdrivePull(false).catch(e => console.warn(e));
+    }
+  }
+}
+function disconnectClick(){
+  if(confirm('Sign out of Google Drive? Your local data stays in this browser.')){
+    if(typeof gdriveDisconnect === 'function') gdriveDisconnect();
+  }
+}
+</script>
+
+<script>window.GDRIVE_CLIENT_ID = '358625617188-h4dafdsn0rib86jabubdb8pgrtlch2vg.apps.googleusercontent.com';</script>
+<script src="gdrive_sync.js" defer></script>
+
+</body>
+</html>
